@@ -2,8 +2,8 @@ export default function Header({ totalAssigned, totalParticipants, completionPer
   return (
     <header className="header">
       <div className="header-inner">
-        <div>
-          <p className="header-badge">DERIVCO GRADUATE PROGRAMME · CAPE TOWN COLAB 2026</p>
+        <div className="header-copy">
+          <p className="header-badge">DERIVCO FOR HR</p>
           <h1>Smart Seat Allocation</h1>
           <p className="header-sub">Training Session Management Platform</p>
         </div>
