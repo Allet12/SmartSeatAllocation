@@ -1,120 +1,74 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import AssignView from './components/AssignView'
+import DashboardView from './components/DashboardView'
+import FeedbackToast from './components/FeedbackToast'
+import Header from './components/Header'
+import NavTabs from './components/NavTabs'
+import RosterView from './components/RosterView'
+import { useSeatAllocation } from './hooks/useSeatAllocation'
+import './styles/stylng.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { data, state, actions, selectors } = useSeatAllocation()
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="root">
+      <Header
+        totalAssigned={state.totalAssigned}
+        totalParticipants={data.totalParticipants}
+        completionPercent={state.completionPercent}
+      />
 
-      <div className="ticks"></div>
+      <NavTabs activeView={state.activeView} onChange={actions.setActiveView} />
+      <FeedbackToast feedback={state.feedback} />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
+      <main className="main">
+        {state.activeView === 'dashboard' && (
+          <DashboardView
+            sessions={data.sessions}
+            departments={data.departments}
+            allocations={state.allocations}
+            getAvailableSeats={selectors.getAvailableSeats}
+            getSessionTotal={selectors.getSessionTotal}
+          />
+        )}
+
+        {state.activeView === 'assign' && (
+          <AssignView
+            sessions={data.sessions}
+            departments={data.departments}
+            selectedSession={state.selectedSession}
+            selectedParticipant={state.selectedParticipant}
+            filterDept={state.filterDept}
+            unassignedList={state.unassignedList}
+            allocations={state.allocations}
+            setSelectedSession={actions.setSelectedSession}
+            setSelectedParticipant={actions.setSelectedParticipant}
+            setFilterDept={actions.setFilterDept}
+            assignParticipant={actions.assignParticipant}
+            getAvailableSeats={selectors.getAvailableSeats}
+            getDeptAvailable={selectors.getDeptAvailable}
+            getSessionTotal={selectors.getSessionTotal}
+          />
+        )}
+
+        {state.activeView === 'roster' && (
+          <RosterView
+            sessions={data.sessions}
+            assignedList={state.assignedList}
+            unassignParticipant={actions.unassignParticipant}
+          />
+        )}
+
+        <section className="hard-limits" aria-label="Hard limits enforced">
+          <h2>Hard Limits Enforced</h2>
           <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
+            <li>Maximum 20 participants per session</li>
+            <li>A participant can only be assigned once</li>
+            <li>Division caps per session: A=8, B=6, C=6</li>
           </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        </section>
+      </main>
+    </div>
   )
 }
 
