@@ -1,5 +1,6 @@
 package org.smartSeatAllocation.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,8 +12,14 @@ public class Participant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long participantId;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
     private String division;
 
     public Participant() {
@@ -20,6 +27,7 @@ public class Participant {
 
     public Participant(String email, String password, String division) {
         this.email = email;
+        this.password = password;
         this.division = division;
     }
 
@@ -68,19 +76,20 @@ public class Participant {
             this.password = password;
             return this;
         }
+
         public ParticipantBuilder setDivision(String division) {
             this.division = division;
             return this;
         }
 
-        public ParticipantBuilder copy (Participant participant){
-            this.email= participant.email;
-            this.password= participant.password;
+        public ParticipantBuilder copy(Participant participant) {
+            this.email = participant.email;
+            this.password = participant.password;
             this.division = participant.division;
             return this;
         }
 
-        public Participant build(){
+        public Participant build() {
             return new Participant(this);
         }
     }
