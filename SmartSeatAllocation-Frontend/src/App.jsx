@@ -59,14 +59,6 @@ function App() {
           />
         )}
 
-        <section className="hard-limits" aria-label="Hard limits enforced">
-          <h2>Hard Limits Enforced</h2>
-          <ul>
-            <li>Maximum 20 participants per session</li>
-            <li>A participant can only be assigned once</li>
-            <li>Division caps per session: A=8, B=6, C=6</li>
-          </ul>
-        </section>
       </main>
     </div>
   )
