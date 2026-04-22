@@ -12,12 +12,13 @@ public class Participant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long participantId;
     private String email;
+    private String password;
     private String division;
 
     public Participant() {
     }
 
-    public Participant(String email, String division) {
+    public Participant(String email, String password, String division) {
         this.email = email;
         this.division = division;
     }
@@ -35,6 +36,10 @@ public class Participant {
         return email;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public String getDivision() {
         return division;
     }
@@ -42,6 +47,7 @@ public class Participant {
     @Override
     public String toString() {
         return "Participant{" +
+                "participantId=" + participantId +
                 ", email='" + email + '\'' +
                 ", division='" + division + '\'' +
                 '}';
@@ -49,10 +55,16 @@ public class Participant {
 
     public static class ParticipantBuilder {
         private String email;
+        private String password;
         private String division;
 
         public ParticipantBuilder setEmail(String email) {
             this.email = email;
+            return this;
+        }
+
+        public ParticipantBuilder setPassword(String password) {
+            this.password = password;
             return this;
         }
         public ParticipantBuilder setDivision(String division) {
@@ -62,6 +74,7 @@ public class Participant {
 
         public ParticipantBuilder copy (Participant participant){
             this.email= participant.email;
+            this.password= participant.password;
             this.division = participant.division;
             return this;
         }
