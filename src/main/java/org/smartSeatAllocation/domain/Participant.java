@@ -25,6 +25,7 @@ public class Participant {
 
     public Participant(ParticipantBuilder participantBuilder) {
         this.email = participantBuilder.email;
+        this.password = participantBuilder.password;
         this.division = participantBuilder.division;
     }
 
