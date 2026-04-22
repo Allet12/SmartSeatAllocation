@@ -1,7 +1,8 @@
-package za.ac.smartseat.domain;
+package org.smartSeatAllocation.domain;
 
 import jakarta.persistence.*;
 import org.smartSeatAllocation.domain.Participant;
+import org.smartSeatAllocation.domain.Session;
 
 import java.util.Date;
 
@@ -49,6 +50,16 @@ public class Booking {
         return bookingDate;
     }
 
+    @Override
+    public String toString() {
+        return "Booking{" +
+                "bookingId=" + bookingId +
+                ", participant=" + participant +
+                ", session=" + session +
+                ", bookingDate=" + bookingDate +
+                '}';
+    }
+
     // 🔥 Builder Pattern
     public static class Builder {
         private Long bookingId;
@@ -77,6 +88,7 @@ public class Booking {
         }
 
         public Booking build() {
+
             return new Booking(this);
         }
     }
