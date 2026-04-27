@@ -26,7 +26,7 @@ export default function RosterView({ sessions, assignedList, unassignParticipant
                   <div key={participant.id} className="roster-card">
                     <div>
                       <strong>{participant.name}</strong>
-                      <p className="muted">Div {participant.department}</p>
+                      <p className="muted">Dept {participant.department}</p>
                     </div>
                     <button
                       type="button"
