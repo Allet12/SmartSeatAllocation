@@ -20,5 +20,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     long countBySessionSessionId(long sessionId);
 
-    long countBySessionSessionIdAndParticipantDivisionIgnoreCase(long sessionId, String division);
+    long countBySessionSessionIdAndParticipantDepartmentDepartmentId(long sessionId, long departmentId);
 }

@@ -1,22 +1,22 @@
 package org.smartSeatAllocation.service;
 
-import org.smartSeatAllocation.domain.Booking;
+import org.smartSeatAllocation.controller.dto.BookingResponse;
 
 public class SeatAllocationResponse {
 
     private final boolean valid;
     private final String message;
-    private final Booking booking;
+    private final BookingResponse booking;
     private final int availableSeats;
 
-    public SeatAllocationResponse(boolean valid, String message, Booking booking, int availableSeats) {
+    public SeatAllocationResponse(boolean valid, String message, BookingResponse booking, int availableSeats) {
         this.valid = valid;
         this.message = message;
         this.booking = booking;
         this.availableSeats = availableSeats;
     }
 
-    public static SeatAllocationResponse success(Booking booking, int availableSeats) {
+    public static SeatAllocationResponse success(BookingResponse booking, int availableSeats) {
         return new SeatAllocationResponse(true, "Booking created successfully", booking, availableSeats);
     }
 
@@ -32,7 +32,7 @@ public class SeatAllocationResponse {
         return message;
     }
 
-    public Booking getBooking() {
+    public BookingResponse getBooking() {
         return booking;
     }
 
@@ -40,4 +40,3 @@ public class SeatAllocationResponse {
         return availableSeats;
     }
 }
-

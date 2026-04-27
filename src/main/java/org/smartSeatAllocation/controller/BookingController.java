@@ -2,20 +2,19 @@ package org.smartSeatAllocation.controller;
 
 import org.smartSeatAllocation.controller.dto.AvailableSeatsResponse;
 import org.smartSeatAllocation.controller.dto.BookingCreateRequest;
+import org.smartSeatAllocation.controller.dto.BookingResponse;
 import org.smartSeatAllocation.domain.Booking;
 import org.smartSeatAllocation.service.IBookingService;
 import org.smartSeatAllocation.service.SeatAllocationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:5173")
 public class BookingController {
 
     private final IBookingService bookingService;
@@ -38,13 +37,28 @@ public class BookingController {
         return ResponseEntity.status(resolveStatus(response.getMessage())).body(response);
     }
 
+    @GetMapping("/bookings")
+    public ResponseEntity<List<BookingResponse>> getAllBookings() {
+        return ResponseEntity.ok(bookingService.getAll().stream().map(BookingResponse::from).toList());
+    }
+
     @GetMapping("/bookings/{bookingId}")
     public ResponseEntity<?> getBookingById(@PathVariable long bookingId) {
         Booking booking = bookingService.read(bookingId);
         if (booking == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Booking not found");
         }
-        return ResponseEntity.ok(booking);
+        return ResponseEntity.ok(BookingResponse.from(booking));
+    }
+
+    @DeleteMapping("/bookings/participant/{participantId}")
+    public ResponseEntity<?> unassignParticipant(@PathVariable long participantId) {
+        boolean removed = bookingService.unassignParticipant(participantId);
+        if (!removed) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Booking not found for participant");
+        }
+
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/sessions/{sessionId}/available-seats")

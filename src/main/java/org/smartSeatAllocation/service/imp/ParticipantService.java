@@ -1,20 +1,25 @@
 package org.smartSeatAllocation.service.imp;
 
+import org.smartSeatAllocation.domain.Department;
 import org.smartSeatAllocation.domain.Participant;
 import org.smartSeatAllocation.factory.ParticipantFactory;
+import org.smartSeatAllocation.repository.DepartmentRepository;
 import org.smartSeatAllocation.repository.ParticipantRepository;
 import org.smartSeatAllocation.service.IParticipantService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ParticipantService implements IParticipantService {
 
     private final ParticipantRepository participantRepository;
+    private final DepartmentRepository departmentRepository;
 
-    public ParticipantService(ParticipantRepository participantRepository) {
+    public ParticipantService(ParticipantRepository participantRepository, DepartmentRepository departmentRepository) {
         this.participantRepository = participantRepository;
+        this.departmentRepository = departmentRepository;
     }
 
     @Override
@@ -23,7 +28,8 @@ public class ParticipantService implements IParticipantService {
             return null;
         }
 
-        return createParticipant(entity.getEmail(), entity.getPassword(), entity.getDivision());
+        Department department = entity.getDepartment();
+        return createParticipant(entity.getEmail(), entity.getPassword(), department);
     }
 
     @Override
@@ -46,8 +52,19 @@ public class ParticipantService implements IParticipantService {
     }
 
     @Override
-    public Participant createParticipant(String email, String password, String division) {
-        Participant participant = ParticipantFactory.createParticipant(email, password, division);
+    public List<Participant> getAll() {
+        return participantRepository.findAll();
+    }
+
+    @Override
+    public Participant createParticipant(String email, String password, long departmentId) {
+        Department department = departmentRepository.findById(departmentId).orElse(null);
+        return createParticipant(email, password, department);
+    }
+
+    @Override
+    public Participant createParticipant(String email, String password, Department department) {
+        Participant participant = ParticipantFactory.createParticipant(email, password, department);
         if (participant == null) {
             return null;
         }

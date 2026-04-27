@@ -9,4 +9,6 @@ public interface IBookingService extends IService<Booking, Long> {
     int getAvailableSeats(long sessionId);
 
     boolean canParticipantBook(long participantId, long sessionId);
+
+    boolean unassignParticipant(long participantId);
 }
