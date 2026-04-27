@@ -64,7 +64,7 @@ export default function AssignView({
                 className={`chip ${filterDept === deptId ? 'active' : ''}`}
                 onClick={() => setFilterDept(deptId)}
               >
-                {deptId === 'ALL' ? 'All' : `Div ${deptId}`}
+                {deptId === 'ALL' ? 'All' : `Dept ${deptId}`}
               </button>
             ))}
           </div>
@@ -81,7 +81,7 @@ export default function AssignView({
               onClick={() => setSelectedParticipant(participant.id)}
             >
               <span>{participant.name}</span>
-              <span className="mono">Div {participant.department}</span>
+              <span className="mono">Dept {participant.department}</span>
             </button>
           ))}
         </div>
