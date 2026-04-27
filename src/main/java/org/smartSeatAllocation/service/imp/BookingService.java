@@ -1,12 +1,11 @@
 package org.smartSeatAllocation.service.imp;
 
+import org.smartSeatAllocation.controller.dto.BookingResponse;
 import org.smartSeatAllocation.domain.Booking;
-import org.smartSeatAllocation.domain.Department;
 import org.smartSeatAllocation.domain.Participant;
 import org.smartSeatAllocation.domain.Session;
 import org.smartSeatAllocation.factory.BookingFactory;
 import org.smartSeatAllocation.repository.BookingRepository;
-import org.smartSeatAllocation.repository.DepartmentRepository;
 import org.smartSeatAllocation.repository.ParticipantRepository;
 import org.smartSeatAllocation.repository.SessionRepository;
 import org.smartSeatAllocation.service.IBookingService;
@@ -14,6 +13,7 @@ import org.smartSeatAllocation.service.SeatAllocationResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,16 +22,13 @@ public class BookingService implements IBookingService {
     private final BookingRepository bookingRepository;
     private final ParticipantRepository participantRepository;
     private final SessionRepository sessionRepository;
-    private final DepartmentRepository departmentRepository;
 
     public BookingService(BookingRepository bookingRepository,
                           ParticipantRepository participantRepository,
-                          SessionRepository sessionRepository,
-                          DepartmentRepository departmentRepository) {
+                          SessionRepository sessionRepository) {
         this.bookingRepository = bookingRepository;
         this.participantRepository = participantRepository;
         this.sessionRepository = sessionRepository;
-        this.departmentRepository = departmentRepository;
     }
 
     @Override
@@ -58,6 +55,11 @@ public class BookingService implements IBookingService {
     @Override
     public void delete(Long id) {
         bookingRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Booking> getAll() {
+        return bookingRepository.findAll();
     }
 
     @Override
@@ -89,10 +91,13 @@ public class BookingService implements IBookingService {
             return SeatAllocationResponse.failure("Session is full", 0);
         }
 
-        int departmentLimit = getDepartmentLimit(participant.getDivision());
+        if (participant.getDepartment() == null) {
+            return SeatAllocationResponse.failure("Participant department not found", getAvailableSeats(sessionId));
+        }
+
         long departmentBookings = bookingRepository
-                .countBySessionSessionIdAndParticipantDivisionIgnoreCase(sessionId, participant.getDivision());
-        if (departmentBookings >= departmentLimit) {
+                .countBySessionSessionIdAndParticipantDepartmentDepartmentId(sessionId, participant.getDepartment().getDepartmentId());
+        if (departmentBookings >= participant.getDepartment().getMaxPerSession()) {
             return SeatAllocationResponse.failure("Department allocation limit reached for this session", getAvailableSeats(sessionId));
         }
 
@@ -102,7 +107,7 @@ public class BookingService implements IBookingService {
         }
 
         Booking savedBooking = bookingRepository.save(booking);
-        return SeatAllocationResponse.success(savedBooking, getAvailableSeats(sessionId));
+        return SeatAllocationResponse.success(BookingResponse.from(savedBooking), getAvailableSeats(sessionId));
     }
 
     @Override
@@ -137,26 +142,22 @@ public class BookingService implements IBookingService {
             return false;
         }
 
-        int departmentLimit = getDepartmentLimit(participant.getDivision());
-        return bookingRepository.countBySessionSessionIdAndParticipantDivisionIgnoreCase(sessionId, participant.getDivision()) < departmentLimit;
+        if (participant.getDepartment() == null) {
+            return false;
+        }
+
+        return bookingRepository.countBySessionSessionIdAndParticipantDepartmentDepartmentId(sessionId, participant.getDepartment().getDepartmentId()) < participant.getDepartment().getMaxPerSession();
     }
 
-    private int getDepartmentLimit(String division) {
-        if (division == null) {
-            return 0;
+    @Override
+    @Transactional
+    public boolean unassignParticipant(long participantId) {
+        List<Booking> participantBookings = bookingRepository.findByParticipantParticipantId(participantId);
+        if (participantBookings.isEmpty()) {
+            return false;
         }
 
-        String normalizedDivision = division.trim().toLowerCase();
-        Optional<Department> departmentOptional = departmentRepository.findByDepartmentNameIgnoreCase(normalizedDivision);
-        if (departmentOptional.isPresent()) {
-            return departmentOptional.get().getMaxPerSession();
-        }
-
-        return switch (normalizedDivision) {
-            case "division a" -> 8;
-            case "division b" -> 6;
-            case "division c" -> 6;
-            default -> 0;
-        };
+        bookingRepository.delete(participantBookings.get(0));
+        return true;
     }
 }
