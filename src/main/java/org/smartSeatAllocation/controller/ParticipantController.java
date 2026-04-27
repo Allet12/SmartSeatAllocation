@@ -6,17 +6,14 @@ import org.smartSeatAllocation.domain.Participant;
 import org.smartSeatAllocation.service.IParticipantService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/participants")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ParticipantController {
 
     private final IParticipantService participantService;
@@ -31,7 +28,7 @@ public class ParticipantController {
             return ResponseEntity.badRequest().body("Participant request is required");
         }
 
-        Participant participant = participantService.createParticipant(request.email(), request.password(), request.division());
+        Participant participant = participantService.createParticipant(request.email(), request.password(), request.departmentId());
         if (participant == null) {
             if (request.email() != null && participantService.existsByEmail(request.email())) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Participant email already exists");
@@ -49,6 +46,11 @@ public class ParticipantController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Participant not found");
         }
         return ResponseEntity.ok(ParticipantResponse.from(participant));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ParticipantResponse>> getAllParticipants() {
+        return ResponseEntity.ok(participantService.getAll().stream().map(ParticipantResponse::from).toList());
     }
 
     @GetMapping("/email/{email}")

@@ -1,5 +1,6 @@
 package org.smartSeatAllocation.controller.dto;
 
-public record ParticipantCreateRequest(String email, String password, String division) {
+public record ParticipantCreateRequest(String email, String password, long departmentId) {
 }
+
 

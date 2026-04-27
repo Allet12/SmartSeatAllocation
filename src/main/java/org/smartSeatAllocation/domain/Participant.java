@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Participant {
@@ -19,22 +21,23 @@ public class Participant {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private String division;
+    @ManyToOne
+    @JoinColumn(name = "departmentId", nullable = false)
+    private Department department;
 
     public Participant() {
     }
 
-    public Participant(String email, String password, String division) {
+    public Participant(String email, String password, Department department) {
         this.email = email;
         this.password = password;
-        this.division = division;
+        this.department = department;
     }
 
     public Participant(ParticipantBuilder participantBuilder) {
         this.email = participantBuilder.email;
         this.password = participantBuilder.password;
-        this.division = participantBuilder.division;
+        this.department = participantBuilder.department;
     }
 
     public long getParticipantId() {
@@ -49,8 +52,8 @@ public class Participant {
         return password;
     }
 
-    public String getDivision() {
-        return division;
+    public Department getDepartment() {
+        return department;
     }
 
     @Override
@@ -58,14 +61,14 @@ public class Participant {
         return "Participant{" +
                 "participantId=" + participantId +
                 ", email='" + email + '\'' +
-                ", division='" + division + '\'' +
+                ", department=" + (department != null ? department.getDepartmentName() : null) +
                 '}';
     }
 
     public static class ParticipantBuilder {
         private String email;
         private String password;
-        private String division;
+        private Department department;
 
         public ParticipantBuilder setEmail(String email) {
             this.email = email;
@@ -77,15 +80,15 @@ public class Participant {
             return this;
         }
 
-        public ParticipantBuilder setDivision(String division) {
-            this.division = division;
+        public ParticipantBuilder setDepartment(Department department) {
+            this.department = department;
             return this;
         }
 
         public ParticipantBuilder copy(Participant participant) {
             this.email = participant.email;
             this.password = participant.password;
-            this.division = participant.division;
+            this.department = participant.department;
             return this;
         }
 
